@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Account;
+use App\Utils\GeneratorQueryTransformerTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\AbstractQuery;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -14,37 +16,25 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class AccountRepository extends ServiceEntityRepository
 {
+    use GeneratorQueryTransformerTrait;
+
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, Account::class);
     }
 
-//    /**
-//     * @return Account[] Returns an array of Account objects
-//     */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param int $hydrationMode
+     * @return \Generator|Account[]
+     */
+    public function generateAll($hydrationMode = AbstractQuery::HYDRATE_OBJECT)
     {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('a.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        return $this->toGenerator(
+            $this->createQueryBuilder('account')
+                ->orderBy('account.creationDatetime', 'ASC')
+                ->getQuery(),
+            null,
+            $hydrationMode
+        );
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Account
-    {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }
