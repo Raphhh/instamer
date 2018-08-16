@@ -31,7 +31,7 @@ class FollowerDiscoverCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('follower:discover')
+            ->setName('remote:follower:discover')
             ->setDescription('Discover potential followers')
             ->addArgument(
                 'username',

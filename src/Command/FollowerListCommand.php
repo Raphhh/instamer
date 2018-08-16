@@ -31,7 +31,7 @@ class FollowerListCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('follower:list')
+            ->setName('remote:follower:list')
             ->setDescription('List account followers')
             ->addArgument(
                 'username',
