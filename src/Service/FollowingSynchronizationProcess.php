@@ -76,7 +76,7 @@ class FollowingSynchronizationProcess
      * @param Following $following
      * @return Following
      */
-    private function addFollowing(Following $following)
+    public function addFollowing(Following $following)
     {
         $existing = $this->followingRepository->findOneBy(['accountId' => $following->getAccountId()]);
         if ($existing) {
