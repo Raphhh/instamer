@@ -60,4 +60,25 @@ class FollowingRepository extends ServiceEntityRepository
             $hydrationMode
         );
     }
+
+    /**
+     * @param \DateTime $before
+     * @param int $hydrationMode
+     * @return \Generator|Following[]
+     */
+    public function generateDeactivables(\DateTime $before, $hydrationMode = AbstractQuery::HYDRATE_OBJECT)
+    {
+        return $this->toGenerator(
+            $this->createQueryBuilder('account')
+                ->andWhere('account.deletionDatetime IS NULL')
+                ->andWhere('account.isFrozen = 0')
+                ->andWhere('account.isReciprocal = 0')
+                ->andWhere('account.creationDatetime < :before')
+                ->orderBy('account.creationDatetime', 'ASC')
+                ->setParameter('before', $before)
+                ->getQuery(),
+            null,
+            $hydrationMode
+        );
+    }
 }
