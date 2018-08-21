@@ -64,6 +64,8 @@ class FollowerSynchronizationProcess
             }
         }
 
+        //todo ici il faudrait ajouter ceux en attente pour ne pas les mettre en deleted
+
         //second, all the other followings reciprocal must be set as not reciprocal
         foreach ($this->followingRepository->generateReciprocalsBut($account, $ids) as $i => $following) {
             $following->setIsReciprocal(false);
