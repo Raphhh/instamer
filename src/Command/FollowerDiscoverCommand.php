@@ -4,9 +4,11 @@ namespace App\Command;
 
 use App\Instagram\Instagram;
 use App\Repository\AccountRepository;
+use App\Service\FollowingDiscover;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class FollowerDiscoverCommand extends Command
@@ -19,13 +21,21 @@ class FollowerDiscoverCommand extends Command
      * @var AccountRepository
      */
     private $accountRepository;
+    /**
+     * @var FollowingDiscover
+     */
+    private $followingDiscover;
 
-    public function __construct(Instagram $instagram, AccountRepository $accountRepository)
-    {
+    public function __construct(
+        Instagram $instagram,
+        AccountRepository $accountRepository,
+        FollowingDiscover $followingDiscover
+    ) {
         parent::__construct();
 
         $this->instagram = $instagram;
         $this->accountRepository = $accountRepository;
+        $this->followingDiscover = $followingDiscover;
     }
 
     protected function configure()
@@ -33,10 +43,8 @@ class FollowerDiscoverCommand extends Command
         $this
             ->setName('remote:follower:discover')
             ->setDescription('Discover potential followers')
-            ->addArgument(
-                'username',
-                InputArgument::REQUIRED
-            );
+            ->addArgument('username', InputArgument::REQUIRED)
+            ->addOption('from', null, InputOption::VALUE_REQUIRED);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -48,7 +56,8 @@ class FollowerDiscoverCommand extends Command
         }
 
         $crawler = $this->instagram->getAccountCrawler($account);
-        foreach ($crawler->discoverAccountsByAccountId($account->getAccountId()) as $account) {
+        $accounts = $this->followingDiscover->discover($crawler, $input->getOption('from'));
+        foreach ($accounts as $account) {
             $output->writeln(sprintf(
                 '%s (%s)',
                 $account->getUsername(),
