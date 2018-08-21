@@ -56,8 +56,9 @@ class FollowingSynchronizationProcess
         // first add all the followings that have been added directly in instagram
         $ids = [];
         foreach ($followings as $i => $following) {
-            $ids[] = $this->addFollowing($following)->getId();
+            $following = $this->addFollowing($following);
             $this->objectManager->flush();
+            $ids[] = $following->getId();
             $this->objectManager->detach($following);
         }
 
