@@ -50,7 +50,7 @@ class FollowingSynchronizationProcess
         Account $account
     ) {
         $followings = $instagramAccountCrawler->getFollowingsByAccountId($account->getAccountId());
-        $followings = $this->followingTransformer->transformList($account, $followings);
+        $followings = $this->followingTransformer->transformList($account, $followings, true);
 
 
         // first add all the followings that have been added directly in instagram
@@ -84,8 +84,13 @@ class FollowingSynchronizationProcess
         ]);
 
         if ($existing) {
-            //if the following was already been synchronized, be sure it is not deleted.
-            $existing->setDeletionDatetime(null);
+            //if the following was already been synchronized, be sure it is not deleted and set frozen.
+            if ($existing->getDeletionDatetime()) {
+                $existing->setDeletionDatetime(null);
+                if (!$existing->isFrozen()) { //be sure to never unfreeze a frozen following
+                    $existing->setIsFrozen($following->isFrozen());
+                }
+            }
             return $existing;
         }
 

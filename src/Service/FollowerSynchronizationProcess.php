@@ -51,7 +51,7 @@ class FollowerSynchronizationProcess
     ) {
 
         $followers = $instagramAccountCrawler->getFollowersByAccountId($account->getAccountId());
-        $followers = $this->followingTransformer->transformList($account, $followers);
+        $followers = $this->followingTransformer->transformList($account, $followers, true);
 
         //first we set as reciprocal all the followings that are followers
         $ids = [];

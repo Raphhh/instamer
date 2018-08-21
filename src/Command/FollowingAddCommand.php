@@ -80,7 +80,7 @@ class FollowingAddCommand extends Command
 
         $output->writeln('<comment>followings add</comment>');
         $followings = $this->followingDiscover->discover($crawler, $input->getOption('from'));
-        $followings = $this->followingTransformer->transformList($account, $followings);
+        $followings = $this->followingTransformer->transformList($account, $followings, false);
         foreach ($followings as $i => $following) {
 
             $output->writeln(sprintf(
