@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+if [ -z "$1" ]
+then
+    echo "username is mandatory"
+    exit 1
+fi
+
+cd $(dirname $0)/..
+
+bin/console following:synchronize "$1"
+bin/console following:prune "$1"
+bin/console following:ADD "$1"
