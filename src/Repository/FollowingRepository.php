@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Account;
 use App\Entity\Following;
 use App\Utils\GeneratorQueryTransformerTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -24,17 +25,20 @@ class FollowingRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param Account $account
      * @param array $ids
      * @param int $hydrationMode
      * @return \Generator|Following[]
      */
-    public function generateActivesBut(array $ids, $hydrationMode = AbstractQuery::HYDRATE_OBJECT)
+    public function generateActivesBut(Account $account, array $ids, $hydrationMode = AbstractQuery::HYDRATE_OBJECT)
     {
         return $this->toGenerator(
-            $this->createQueryBuilder('account')
-                ->andWhere('account.id NOT IN(:ids)')
-                ->andWhere('account.deletionDatetime IS NULL')
-                ->orderBy('account.creationDatetime', 'ASC')
+            $this->createQueryBuilder('f')
+                ->andWhere('f.account = :account')
+                ->andWhere('f.id NOT IN(:ids)')
+                ->andWhere('f.deletionDatetime IS NULL')
+                ->orderBy('f.creationDatetime', 'ASC')
+                ->setParameter('account', $account)
                 ->setParameter('ids', $ids)
                 ->getQuery(),
             null,
@@ -43,17 +47,20 @@ class FollowingRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param Account $account
      * @param array $ids
      * @param int $hydrationMode
      * @return \Generator|Following[]
      */
-    public function generateReciprocalsBut(array $ids, $hydrationMode = AbstractQuery::HYDRATE_OBJECT)
+    public function generateReciprocalsBut(Account $account, array $ids, $hydrationMode = AbstractQuery::HYDRATE_OBJECT)
     {
         return $this->toGenerator(
-            $this->createQueryBuilder('account')
-                ->andWhere('account.id NOT IN(:ids)')
-                ->andWhere('account.isReciprocal = 1')
-                ->orderBy('account.creationDatetime', 'ASC')
+            $this->createQueryBuilder('f')
+                ->andWhere('f.account = :account')
+                ->andWhere('f.id NOT IN(:ids)')
+                ->andWhere('f.isReciprocal = 1')
+                ->orderBy('f.creationDatetime', 'ASC')
+                ->setParameter('account', $account)
                 ->setParameter('ids', $ids)
                 ->getQuery(),
             null,
@@ -62,19 +69,22 @@ class FollowingRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param Account $account
      * @param \DateTime $before
      * @param int $hydrationMode
      * @return \Generator|Following[]
      */
-    public function generateDeactivables(\DateTime $before, $hydrationMode = AbstractQuery::HYDRATE_OBJECT)
+    public function generateDeactivables(Account $account, \DateTime $before, $hydrationMode = AbstractQuery::HYDRATE_OBJECT)
     {
         return $this->toGenerator(
-            $this->createQueryBuilder('account')
-                ->andWhere('account.deletionDatetime IS NULL')
-                ->andWhere('account.isFrozen = 0')
-                ->andWhere('account.isReciprocal = 0')
-                ->andWhere('account.creationDatetime < :before')
-                ->orderBy('account.creationDatetime', 'ASC')
+            $this->createQueryBuilder('f')
+                ->andWhere('f.account = :account')
+                ->andWhere('f.deletionDatetime IS NULL')
+                ->andWhere('f.isFrozen = 0')
+                ->andWhere('f.isReciprocal = 0')
+                ->andWhere('f.creationDatetime < :before')
+                ->orderBy('f.creationDatetime', 'ASC')
+                ->setParameter('account', $account)
                 ->setParameter('before', $before)
                 ->getQuery(),
             null,

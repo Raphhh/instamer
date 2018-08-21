@@ -63,7 +63,7 @@ class FollowingSynchronizationProcess
 
         // second, delete all the followings that have been removed directly in instagram
         // that means all the active others
-        foreach ($this->followingRepository->generateActivesBut(array_filter($ids)) as $i => $following) {
+        foreach ($this->followingRepository->generateActivesBut($account, array_filter($ids)) as $i => $following) {
             $following->setDeletionDatetime(new \DateTime());
             $this->objectManager->flush();
             $this->objectManager->detach($following);
@@ -78,7 +78,11 @@ class FollowingSynchronizationProcess
      */
     public function addFollowing(Following $following)
     {
-        $existing = $this->followingRepository->findOneBy(['accountId' => $following->getAccountId()]);
+        $existing = $this->followingRepository->findOneBy([
+            'account' => $following->getAccount(),
+            'accountId' => $following->getAccountId(),
+        ]);
+
         if ($existing) {
             //if the following was already been synchronized, be sure it is not deleted.
             $existing->setDeletionDatetime(null);

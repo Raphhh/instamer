@@ -85,7 +85,7 @@ class FollowingPruneCommand extends Command
         }
 
         $output->writeln(sprintf('<comment>followings prune before %s</comment>', $before->format('c')));
-        foreach ($this->followingRepository->generateDeactivables($before) as $i => $following) {
+        foreach ($this->followingRepository->generateDeactivables($account, $before) as $i => $following) {
 
             $output->writeln(sprintf(
                 '[%s] %s (%s)',

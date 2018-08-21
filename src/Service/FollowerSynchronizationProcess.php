@@ -65,7 +65,7 @@ class FollowerSynchronizationProcess
         }
 
         //second, all the other followings reciprocal must be set as not reciprocal
-        foreach ($this->followingRepository->generateReciprocalsBut($ids) as $i => $following) {
+        foreach ($this->followingRepository->generateReciprocalsBut($account, $ids) as $i => $following) {
             $following->setIsReciprocal(false);
             $this->objectManager->flush();
             $this->objectManager->detach($following);
@@ -80,7 +80,10 @@ class FollowerSynchronizationProcess
      */
     private function setFollowingAsReciprocal(Following $follower)
     {
-        $existing = $this->followingRepository->findOneBy(['accountId' => $follower->getAccountId()]);
+        $existing = $this->followingRepository->findOneBy([
+            'account' => $follower->getAccount(),
+            'accountId' => $follower->getAccountId(),
+        ]);
         if ($existing) {
             $existing->setIsReciprocal(true);
             return $existing;
