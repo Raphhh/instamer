@@ -48,9 +48,10 @@ class FollowerListCommand extends Command
         }
 
         $crawler = $this->instagram->getAccountCrawler($account);
-        foreach ($crawler->getFollowersByAccountId($account->getAccountId()) as $account) {
+        foreach ($crawler->getFollowersByAccountId($account->getAccountId()) as $i => $account) {
             $output->writeln(sprintf(
-                '%s (%s)',
+                '%s %s (%s)',
+                $i,
                 $account->getUsername(),
                 $account->getPk()
             ));

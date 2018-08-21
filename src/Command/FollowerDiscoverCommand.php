@@ -57,9 +57,10 @@ class FollowerDiscoverCommand extends Command
 
         $crawler = $this->instagram->getAccountCrawler($account);
         $accounts = $this->followingDiscover->discover($crawler, $input->getOption('from'));
-        foreach ($accounts as $account) {
+        foreach ($accounts as $i => $account) {
             $output->writeln(sprintf(
-                '%s (%s)',
+                '%s %s (%s)',
+                $i,
                 $account->getUsername(),
                 $account->getPk()
             ));

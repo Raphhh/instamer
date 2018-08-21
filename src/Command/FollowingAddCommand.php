@@ -81,7 +81,14 @@ class FollowingAddCommand extends Command
         $output->writeln('<comment>followings add</comment>');
         $followings = $this->followingDiscover->discover($crawler, $input->getOption('from'));
         $followings = $this->followingTransformer->transformList($account, $followings);
-        foreach ($followings as $following) {
+        foreach ($followings as $i => $following) {
+
+            $output->writeln(sprintf(
+                '%s %s (%s)',
+                $i,
+                $following->getUsername(),
+                $following->getAccountId()
+            ));
 
             $crawler->follow($following->getAccountId());
             $following = $this->followingSynchronizationProcess->addFollowing($following);
