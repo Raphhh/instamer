@@ -65,7 +65,8 @@ class FollowingAddCommand extends Command
             ->setName('following:add')
             ->setDescription('Add relations')
             ->addArgument('username', InputArgument::REQUIRED)
-            ->addOption('from', null, InputOption::VALUE_REQUIRED);
+            ->addOption('from', null, InputOption::VALUE_REQUIRED)
+            ->addOption('limit', null, InputOption::VALUE_REQUIRED, '', 0);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -95,6 +96,10 @@ class FollowingAddCommand extends Command
 
             $this->objectManager->flush();
             $this->objectManager->detach($following);
+
+            if ($input->getOption('limit') && $input->getOption('limit') >= $i + 1) {
+                break;
+            }
 
             $output->write('sleeping');
             sleep(1);
