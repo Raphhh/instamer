@@ -122,7 +122,7 @@ class FollowingAddCommand extends Command
             $this->objectManager->flush();
             $this->objectManager->detach($following);
 
-            if ($input->getOption('limit') && $input->getOption('limit') >= ++$index) {
+            if ($input->getOption('limit') && $input->getOption('limit') <= ++$index) {
                 break;
             }
 
