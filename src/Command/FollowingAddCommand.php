@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Instagram\Instagram;
 use App\Instagram\Transformer\FollowingTransformer;
 use App\Repository\AccountRepository;
+use App\Repository\FollowingRepository;
 use App\Service\FollowingDiscover;
 use App\Service\FollowingSynchronizationProcess;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -40,6 +41,10 @@ class FollowingAddCommand extends Command
      * @var FollowingDiscover
      */
     private $followingDiscover;
+    /**
+     * @var FollowingRepository
+     */
+    private $followingRepository;
 
     public function __construct(
         Instagram $instagram,
@@ -47,7 +52,8 @@ class FollowingAddCommand extends Command
         ObjectManager $objectManager,
         FollowingTransformer $followingTransformer,
         FollowingSynchronizationProcess $followingSynchronizationProcess,
-        FollowingDiscover $followingDiscover
+        FollowingDiscover $followingDiscover,
+        FollowingRepository $followingRepository
     ) {
         parent::__construct();
 
@@ -57,6 +63,7 @@ class FollowingAddCommand extends Command
         $this->followingTransformer = $followingTransformer;
         $this->followingSynchronizationProcess = $followingSynchronizationProcess;
         $this->followingDiscover = $followingDiscover;
+        $this->followingRepository = $followingRepository;
     }
 
     protected function configure()
@@ -82,14 +89,32 @@ class FollowingAddCommand extends Command
         $output->writeln('<comment>followings add</comment>');
         $followings = $this->followingDiscover->discover($crawler, $input->getOption('from'));
         $followings = $this->followingTransformer->transformList($account, $followings, false);
+
+        $index = 0;
+
         foreach ($followings as $i => $following) {
 
-            $output->writeln(sprintf(
+            $output->write(sprintf(
                 '%s %s (%s)',
-                $i,
+                $index,
                 $following->getUsername(),
                 $following->getAccountId()
             ));
+
+            $existing = $this->followingRepository->findOneBy([
+                'account' => $following->getAccount(),
+                'accountId' => $following->getAccountId(),
+            ]);
+
+            if ($existing && !$existing->getDeletionDatetime()) {
+                $output->writeln(sprintf(
+                    ' => already following #%s',
+                    $existing->getId()
+                ));
+                continue;
+            }
+
+            $output->writeln(' => follow');
 
             $crawler->follow($following->getAccountId());
             $following = $this->followingSynchronizationProcess->addFollowing($following);
@@ -97,7 +122,7 @@ class FollowingAddCommand extends Command
             $this->objectManager->flush();
             $this->objectManager->detach($following);
 
-            if ($input->getOption('limit') && $input->getOption('limit') >= $i + 1) {
+            if ($input->getOption('limit') && $input->getOption('limit') >= ++$index) {
                 break;
             }
 
