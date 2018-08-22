@@ -15,7 +15,7 @@ class FollowingDiscover
     {
         if ($fromUsername) {
             $accountId = $instagramAccountCrawler->getAccountIdFromUsername($fromUsername);
-            return $instagramAccountCrawler->getFollowingsByAccountId($accountId);
+            return $instagramAccountCrawler->getFollowersByAccountId($accountId);
         }
         return $instagramAccountCrawler->discoverAccountsByAccountId($instagramAccountCrawler->getCurrentAccountId());
     }
