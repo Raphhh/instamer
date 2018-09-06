@@ -91,7 +91,7 @@ class FollowingSynchronizationProcess
 
                 //todo ceci n'est pas juste dans le cas d'e l'attente d'une demande, car le following sera marqué comme deleted! du coup, il deviendra frozen ensuite.
                 if (!$existing->isFrozen()) { //be sure to never unfreeze a frozen following
-                    $existing->setIsFrozen($following->isFrozen());
+                    //$existing->setIsFrozen($following->isFrozen());
                 }
             }
             return $existing;

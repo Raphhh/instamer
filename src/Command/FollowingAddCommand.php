@@ -73,7 +73,8 @@ class FollowingAddCommand extends Command
             ->setDescription('Add relations')
             ->addArgument('username', InputArgument::REQUIRED)
             ->addOption('from', null, InputOption::VALUE_REQUIRED)
-            ->addOption('limit', null, InputOption::VALUE_REQUIRED, '', 0);
+            ->addOption('limit', null, InputOption::VALUE_REQUIRED, '', 0)
+            ->addOption('include-private', null, InputOption::VALUE_NONE);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -88,11 +89,12 @@ class FollowingAddCommand extends Command
 
         $output->writeln('<comment>followings add</comment>');
         $followings = $this->followingDiscover->discover($crawler, $input->getOption('from'));
-        $followings = $this->followingTransformer->transformList($account, $followings, false);
 
         $index = 0;
 
-        foreach ($followings as $i => $following) {
+        foreach ($followings as $i => $apiFollowing) {
+
+            $following = $this->followingTransformer->transform($account, $apiFollowing, false);
 
             $output->write(sprintf(
                 '%s %s (%s)',
@@ -114,6 +116,11 @@ class FollowingAddCommand extends Command
                 continue;
             }
 
+            if (!$input->getOption('include-private') && $apiFollowing->isIsPrivate()) {
+                $output->writeln(' => private not followed');
+                continue;
+            }
+
             $output->writeln(' => follow');
 
             $crawler->follow($following->getAccountId());
@@ -126,17 +133,8 @@ class FollowingAddCommand extends Command
                 break;
             }
 
-            $output->write('sleeping');
-            sleep(1);
-            $output->write('.');
-            sleep(1);
-            $output->write('.');
-            sleep(1);
-            $output->write('.');
-            sleep(1);
-            $output->write('.');
-            sleep(1);
-            $output->writeln('.');
+            $output->writeln('sleeping');
+            sleep(mt_rand(100, 1000));
         }
     }
 }

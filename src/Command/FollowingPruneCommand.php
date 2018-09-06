@@ -104,17 +104,8 @@ class FollowingPruneCommand extends Command
             $this->objectManager->flush();
             $this->objectManager->detach($following);
 
-            $output->write('sleeping');
-            sleep(1);
-            $output->write('.');
-            sleep(1);
-            $output->write('.');
-            sleep(1);
-            $output->write('.');
-            sleep(1);
-            $output->write('.');
-            sleep(1);
-            $output->writeln('.');
+            $output->writeln('sleeping');
+            sleep(mt_rand(10, 200));
         }
     }
 }
