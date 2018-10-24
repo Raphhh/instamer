@@ -74,6 +74,7 @@ class FollowingAddCommand extends Command
             ->addArgument('username', InputArgument::REQUIRED)
             ->addOption('from', null, InputOption::VALUE_REQUIRED)
             ->addOption('limit', null, InputOption::VALUE_REQUIRED, '', 0)
+            ->addOption('pattern', null, InputOption::VALUE_REQUIRED)
             ->addOption('include-private', null, InputOption::VALUE_NONE);
     }
 
@@ -108,9 +109,9 @@ class FollowingAddCommand extends Command
                 'accountId' => $following->getAccountId(),
             ]);
 
-            if ($existing && !$existing->getDeletionDatetime()) {
+            if ($existing) {
                 $output->writeln(sprintf(
-                    ' => already following #%s',
+                    ' => already existing #%s',
                     $existing->getId()
                 ));
                 continue;
@@ -118,6 +119,14 @@ class FollowingAddCommand extends Command
 
             if (!$input->getOption('include-private') && $apiFollowing->isIsPrivate()) {
                 $output->writeln(' => private not followed');
+                continue;
+            }
+
+            if (
+                $input->getOption('pattern')
+                && strpos($following->getUsername(), $input->getOption('pattern')) === false
+            ) {
+                $output->writeln(' => pattern do not match');
                 continue;
             }
 

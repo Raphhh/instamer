@@ -71,20 +71,22 @@ class FollowingRepository extends ServiceEntityRepository
     /**
      * @param Account $account
      * @param \DateTime $before
+     * @param $isReciprocal
      * @param int $hydrationMode
      * @return \Generator|Following[]
      */
-    public function generateDeactivables(Account $account, \DateTime $before, $hydrationMode = AbstractQuery::HYDRATE_OBJECT)
+    public function generateDeactivables(Account $account, \DateTime $before, $isReciprocal, $hydrationMode = AbstractQuery::HYDRATE_OBJECT)
     {
         return $this->toGenerator(
             $this->createQueryBuilder('f')
                 ->andWhere('f.account = :account')
                 ->andWhere('f.deletionDatetime IS NULL')
                 ->andWhere('f.isFrozen = 0')
-                ->andWhere('f.isReciprocal = 0')
+                ->andWhere('f.isReciprocal = :is_reciprocal')
                 ->andWhere('f.creationDatetime < :before')
                 ->orderBy('f.creationDatetime', 'ASC')
                 ->setParameter('account', $account)
+                ->setParameter('is_reciprocal', $isReciprocal)
                 ->setParameter('before', $before)
                 ->getQuery(),
             null,

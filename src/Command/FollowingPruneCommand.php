@@ -62,6 +62,12 @@ class FollowingPruneCommand extends Command
                 '10 days ago'
             )
             ->addOption(
+                'reciprocals',
+                null,
+                InputOption::VALUE_NONE,
+                'remove reciprocals'
+            )
+            ->addOption(
                 'dry-run',
                 null,
                 InputOption::VALUE_NONE,
@@ -85,10 +91,11 @@ class FollowingPruneCommand extends Command
         }
 
         $output->writeln(sprintf('<comment>followings prune before %s</comment>', $before->format('c')));
-        foreach ($this->followingRepository->generateDeactivables($account, $before) as $i => $following) {
+        foreach ($this->followingRepository->generateDeactivables($account, $before, $input->getOption('reciprocals')) as $i => $following) {
 
             $output->writeln(sprintf(
-                '[%s] %s (%s)',
+                '%s [%s] %s (%s)',
+                $i,
                 $following->getId(),
                 $following->getUsername(),
                 $following->getAccountId()
