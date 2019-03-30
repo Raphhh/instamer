@@ -112,4 +112,25 @@ class InstagramAccountCrawler extends InstagramConnection
             throw new InvalidCredentialsException($e->getMessage(), $e->getCode(), $e);
         }
     }
+
+    /**
+     * @param null $maxId
+     * @param int $sleep
+     * @return \Generator|\InstagramAPI\Response\Model\Media[]
+     */
+    public function getLikes($maxId = null, $sleep = InstagramConnection::TEMPORIZATION)
+    {
+        try {
+            do {
+                $response = $this->getInstagram()->media->getLikedFeed($maxId);
+                foreach ($response->getItems() as $item) {
+                    yield $item;
+                }
+                $maxId = $response->getNextMaxId();
+                sleep($sleep);
+            } while ($maxId !== null);
+        } catch (NotFoundException $e) {
+            throw new InvalidCredentialsException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
 }
